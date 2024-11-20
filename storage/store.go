@@ -6,34 +6,36 @@ import (
 	mongo_store "github.com/mcgtrt/go-puerto/storage/mongo"
 	postgres_store "github.com/mcgtrt/go-puerto/storage/postgres"
 	valkey_store "github.com/mcgtrt/go-puerto/storage/valkey"
-	"go.mongodb.org/mongo-driver/mongo"
+	"github.com/mcgtrt/go-puerto/utils"
 )
 
+// General store structure holding all database controllers
 type Store struct {
 	Mongo    *mongo_store.MongoStore
 	Postgres *postgres_store.PostgresStore
 	Valkey   *valkey_store.ValkeyStore
 }
 
-func NewStore(config *Config) (*Store, error) {
+// Create new store from local config
+func NewStore(config *utils.Config) (*Store, error) {
 	var (
 		mongo    *mongo_store.MongoStore
 		postgres *postgres_store.PostgresStore
 		valkey   *valkey_store.ValkeyStore
 	)
-	if config.WithMongo {
-		if config.MongoClient == nil {
+	if config.Mongo != nil {
+		if config.Mongo.Client == nil {
 			return nil, errors.New("mongo client cannot be empty")
 		}
-		if config.MongoDBName == "" {
+		if config.Mongo.DBName == "" {
 			return nil, errors.New("mongo database name cannot be empty")
 		}
-		mongo = mongo_store.NewMongoStore(config.MongoClient, config.MongoDBName)
+		mongo = mongo_store.NewMongoStore(config.Mongo.Client, config.Mongo.DBName)
 	}
-	if config.WithPostgres {
+	if config.Postgres != nil {
 		postgres = postgres_store.NewPostgresStore()
 	}
-	if config.WithValkey {
+	if config.Valkey != nil {
 		valkey = valkey_store.NewValkeyStore()
 	}
 
@@ -42,13 +44,4 @@ func NewStore(config *Config) (*Store, error) {
 		Postgres: postgres,
 		Valkey:   valkey,
 	}, nil
-}
-
-type Config struct {
-	MongoClient *mongo.Client
-	MongoDBName string
-
-	WithMongo    bool
-	WithPostgres bool
-	WithValkey   bool
 }
