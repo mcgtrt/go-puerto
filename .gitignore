@@ -1,0 +1,6 @@
+# directories
+bin/
+tmp/
+
+# config
+.env
