@@ -1,13 +1,18 @@
 package api
 
-import "github.com/mcgtrt/go-puerto/storage"
+import (
+	"github.com/mcgtrt/go-puerto/api/handlers"
+	"github.com/mcgtrt/go-puerto/storage"
+)
+
+type APIFunc func(c *handlers.Ctx) error
 
 type Handler struct {
-	Store *storage.Store
+	View *handlers.ViewHandler
 }
 
 func NewHandler(store *storage.Store) *Handler {
 	return &Handler{
-		Store: store,
+		View: handlers.NewViewHandler(store),
 	}
 }

@@ -1,0 +1,10 @@
+{
+    // Extremely useful settings for using HTML & CSS in .templ files
+    "editor.formatOnSave": true,
+    "[templ]": {
+        "editor.defaultFormatter": "a-h.templ"
+    },
+    "emmet.includeLanguages": {
+        "templ": "html"
+    },
+}
