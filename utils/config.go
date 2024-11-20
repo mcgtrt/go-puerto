@@ -58,16 +58,25 @@ func NewDefaultConfig() (*Config, error) {
 // Configuration required for HTTP server
 type HTTPConfig struct {
 	Port int
+
+	WithHTMX     bool
+	WithAlpineJS bool
 }
 
 func newDefaultHTTPConfig() (*HTTPConfig, error) {
+	config := &HTTPConfig{}
 	port, err := strconv.Atoi(os.Getenv("HTTP_PORT"))
 	if err != nil {
 		return nil, errors.New("http port must be a valid port number")
 	}
-	return &HTTPConfig{
-		Port: port,
-	}, nil
+	config.Port = port
+	if os.Getenv("INCLUDE_HTMX") == "true" {
+		config.WithHTMX = true
+	}
+	if os.Getenv("INCLUDE_ALPINE_JS") == "true" {
+		config.WithAlpineJS = true
+	}
+	return config, nil
 }
 
 // Required configuration for creating mongodb connection
