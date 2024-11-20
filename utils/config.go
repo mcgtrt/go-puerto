@@ -1,21 +1,34 @@
 package utils
 
 import (
+	"context"
+	"errors"
 	"os"
+	"strconv"
 
 	_ "github.com/joho/godotenv/autoload"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // Holds global configuration sourced from local .env file
 type Config struct {
+	HTTP     *HTTPConfig
 	Mongo    *MongoConfig
 	Postgres *PostgresConfig
 	Valkey   *ValkeyConfig
 }
 
+// Create new default config from the local .env file. If any part of the configuration
+// will cause an error, will return an empty config (nil) and error message
 func NewDefaultConfig() (*Config, error) {
 	config := &Config{}
+
+	http, err := newDefaultHTTPConfig()
+	if err != nil {
+		return nil, err
+	}
+	config.HTTP = http
 
 	if os.Getenv("INCLUDE_MONGO") == "true" {
 		mongo, err := newDefaultMongoConfig()
@@ -42,23 +55,61 @@ func NewDefaultConfig() (*Config, error) {
 	return config, nil
 }
 
+// Configuration required for HTTP server
+type HTTPConfig struct {
+	Port int
+}
+
+func newDefaultHTTPConfig() (*HTTPConfig, error) {
+	port, err := strconv.Atoi(os.Getenv("HTTP_PORT"))
+	if err != nil {
+		return nil, errors.New("http port must be a valid port number")
+	}
+	return &HTTPConfig{
+		Port: port,
+	}, nil
+}
+
+// Required configuration for creating mongodb connection
 type MongoConfig struct {
 	Client *mongo.Client
 	DBName string
 }
 
 func newDefaultMongoConfig() (*MongoConfig, error) {
-	return nil, nil
+	dbname := os.Getenv("MONGO_DB_NAME")
+	if dbname == "" {
+		return nil, errors.New("mongo database name cannot be empty")
+	}
+
+	var (
+		username    = os.Getenv("MONGO_USERNAME")
+		password    = os.Getenv("MONGO_PASSWORD")
+		host        = os.Getenv("MONGO_HOST")
+		port        = os.Getenv("MONGO_PORT")
+		dburl       = "mongodb://" + username + ":" + password + "@" + host + ":" + port
+		client, err = mongo.Connect(context.Background(), options.Client().ApplyURI(dburl))
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &MongoConfig{
+		Client: client,
+		DBName: dbname,
+	}, nil
 }
 
+// Required configuration for creating postgres connection
 type PostgresConfig struct{}
 
 func newDefaultPostgresConfig() (*PostgresConfig, error) {
-	return nil, nil
+	return &PostgresConfig{}, nil
 }
 
+// Required configuration for creating valkey connection
 type ValkeyConfig struct{}
 
 func newDefaultValkeyConfig() (*ValkeyConfig, error) {
-	return nil, nil
+	return &ValkeyConfig{}, nil
 }
