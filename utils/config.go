@@ -59,8 +59,7 @@ func NewDefaultConfig() (*Config, error) {
 type HTTPConfig struct {
 	Port int
 
-	WithHTMX     bool
-	WithAlpineJS bool
+	ImportAlpineJS bool
 }
 
 func newDefaultHTTPConfig() (*HTTPConfig, error) {
@@ -70,11 +69,8 @@ func newDefaultHTTPConfig() (*HTTPConfig, error) {
 		return nil, errors.New("http port must be a valid port number")
 	}
 	config.Port = port
-	if os.Getenv("INCLUDE_HTMX") == "true" {
-		config.WithHTMX = true
-	}
-	if os.Getenv("INCLUDE_ALPINE_JS") == "true" {
-		config.WithAlpineJS = true
+	if os.Getenv("IMPORT_ALPINE_JS") == "true" {
+		config.ImportAlpineJS = true
 	}
 	return config, nil
 }

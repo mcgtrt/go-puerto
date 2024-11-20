@@ -5,7 +5,7 @@ Tired creating project skeleton from scratch? Here's what you get with `go-puert
 - Automatic store connections (MongoDB, Postgres, Valkey)
 - Automatic configuration from .env
 - Compile-ready a-h/templ templates and layouts
-- (optional) Auto imported HTMX and Alpine.js
+- Auto imported HTMX and (optional) Alpine.js
 - Internationalisation (website language + used currency)
 - Web and file server
 - Ultra useful middlewares
