@@ -7,6 +7,7 @@ type MongoStore struct {
 	DBName string
 }
 
+// Default mongo store setup with client connection
 func NewMongoStore(client *mongo.Client, dbname string) *MongoStore {
 	return &MongoStore{
 		Client: client,

@@ -6,6 +6,7 @@ import (
 	"unicode"
 )
 
+// This is a standard configuration. Modify these to your needs.
 const (
 	MIN_NAME_LEN     = 2
 	MIN_PASSWORD_LEN = 8
@@ -14,6 +15,9 @@ const (
 	MAX_PASSWORD_LEN = 32
 )
 
+// This email validation method is bit more advanced than a simple regex. If, for any reason,
+// this configuration will be too much (or less likely too little) for your project,
+// modify this function by adding/removing advanced conditions or regex itself.
 func IsEmailCorrect(email string) bool {
 	regex := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,10}$`
 	matched, _ := regexp.MatchString(regex, email)
@@ -43,6 +47,7 @@ func IsEmailCorrect(email string) bool {
 	return true
 }
 
+// Quickly validate name/surname with the min/max system lenghts
 func IsNameCorrect(name string) bool {
 	if MIN_NAME_LEN > 0 {
 		if len(name) < MIN_NAME_LEN {
@@ -55,6 +60,8 @@ func IsNameCorrect(name string) bool {
 	return true
 }
 
+// Validate if password has correct lenght, has at least one number,
+// uppercased, and special character
 func IsPasswordCorrect(pwd string) bool {
 	var number, upper, special = false, false, false
 

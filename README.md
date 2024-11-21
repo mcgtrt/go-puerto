@@ -10,6 +10,7 @@ Tired creating project skeleton from scratch? Here's what you get with `go-puert
 - Auto imported HTMX and (optional) Alpine.js
 - Internationalisation (website language + used currency)
 - Built-in AES encryption/decryption
+- Latest go-chi router
 - Web and file server
 - Ultra useful middlewares
 

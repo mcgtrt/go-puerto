@@ -68,6 +68,9 @@ func newDefaultHTTPConfig() (*HTTPConfig, error) {
 	if err != nil {
 		return nil, errors.New("http port must be a valid port number")
 	}
+	if port < 1000 || port > 65535 {
+		return nil, errors.New("only registered and dynamic ports are allowed (1000 - 65535)")
+	}
 	config.Port = port
 	if os.Getenv("IMPORT_ALPINE_JS") == "true" {
 		config.ImportAlpineJS = true
@@ -78,8 +81,30 @@ func newDefaultHTTPConfig() (*HTTPConfig, error) {
 
 // Required configuration for creating mongodb connection
 type MongoConfig struct {
-	Client *mongo.Client
-	DBName string
+	Username string
+	Password string
+	Host     string
+	Port     string
+	DBName   string
+}
+
+func (c *MongoConfig) ConnectionString() string {
+	if c.Username == "" || c.Password == "" || c.Host == "" || c.Port == "" {
+		return ""
+	}
+	return "mongodb://" + c.Username + ":" + c.Password + "@" + c.Host + ":" + c.Port
+}
+
+func (c *MongoConfig) Client() (*mongo.Client, error) {
+	ctx := context.Background()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(c.ConnectionString()))
+	if err != nil {
+		return nil, errors.New("error creating mongo client: " + err.Error())
+	}
+	if err := client.Ping(ctx, nil); err != nil {
+		return nil, errors.New("error connecting to mongodb - could not ping the database: " + err.Error())
+	}
+	return client, nil
 }
 
 func newDefaultMongoConfig() (*MongoConfig, error) {
@@ -87,21 +112,26 @@ func newDefaultMongoConfig() (*MongoConfig, error) {
 	if dbname == "" {
 		return nil, errors.New("mongo database name cannot be empty")
 	}
-
-	var (
-		username    = os.Getenv("MONGO_USERNAME")
-		password    = os.Getenv("MONGO_PASSWORD")
-		host        = os.Getenv("MONGO_HOST")
-		port        = os.Getenv("MONGO_PORT")
-		dburl       = "mongodb://" + username + ":" + password + "@" + host + ":" + port
-		client, err = mongo.Connect(context.Background(), options.Client().ApplyURI(dburl))
-	)
-	if err != nil {
-		return nil, err
+	username := os.Getenv("MONGO_USERNAME")
+	if username == "" {
+		return nil, errors.New("mongo username cannot be empty")
 	}
-
+	password := os.Getenv("MONGO_PASSWORD")
+	if password == "" {
+		return nil, errors.New("mongo password cannot be empty")
+	}
+	host := os.Getenv("MONGO_HOST")
+	if host == "" {
+		host = "localhost"
+	}
+	port := os.Getenv("MONGO_PORT")
+	if _, err := strconv.Atoi(port); err != nil {
+		return nil, errors.New("invalid port for mongo connection")
+	}
+	if port == "" {
+		port = "27017"
+	}
 	return &MongoConfig{
-		Client: client,
 		DBName: dbname,
 	}, nil
 }

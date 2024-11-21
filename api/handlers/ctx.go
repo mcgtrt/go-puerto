@@ -32,6 +32,13 @@ func (c *Ctx) JSON(code int, v any) error {
 	return json.NewEncoder(c.Response).Encode(v)
 }
 
+func (c *Ctx) Text(code int, v string) error {
+	c.Response.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	c.Response.WriteHeader(code)
+	_, err := c.Response.Write([]byte(v))
+	return err
+}
+
 func (c *Ctx) Error(code int) {
 	http.Error(c.Response, http.StatusText(code), code)
 }

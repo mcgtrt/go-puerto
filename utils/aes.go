@@ -10,6 +10,8 @@ import (
 	"os"
 )
 
+// Encrypt string message using AES encryption. Make sure AES_SECRET
+// key with value was added to environmental variables.
 func EncryptAES(message string) (string, error) {
 	var (
 		key        = os.Getenv("AES_SECRET")
@@ -36,6 +38,8 @@ func EncryptAES(message string) (string, error) {
 	return base64.RawStdEncoding.EncodeToString(cipherText), nil
 }
 
+// Decrypt encrypted message using AES encryption. Make sure AES_SECRET
+// key with value was added to environmental variables.
 func DecryptAES(secure string) (decoded string, err error) {
 	cipherText, err := base64.RawStdEncoding.DecodeString(secure)
 	if err != nil {
