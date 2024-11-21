@@ -39,14 +39,22 @@ func Base(title, lang string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\"><head>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = css_reset().Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/layout.templ`, Line: 9, Col: 17}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `templates/layout/layout.templ`, Line: 10, Col: 17}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -61,6 +69,32 @@ func Base(title, lang string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</body></html>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		return templ_7745c5c3_Err
+	})
+}
+
+func css_reset() templ.Component {
+	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
+		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templruntime.GetBuffer(templ_7745c5c3_W)
+		if !templ_7745c5c3_IsBuffer {
+			defer func() {
+				templ_7745c5c3_BufErr := templruntime.ReleaseBuffer(templ_7745c5c3_Buffer)
+				if templ_7745c5c3_Err == nil {
+					templ_7745c5c3_Err = templ_7745c5c3_BufErr
+				}
+			}()
+		}
+		ctx = templ.InitializeContext(ctx)
+		templ_7745c5c3_Var4 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var4 == nil {
+			templ_7745c5c3_Var4 = templ.NopComponent
+		}
+		ctx = templ.ClearChildren(ctx)
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<style>\n\t\thtml, body, div, span, applet, object, iframe,\n\t\th1, h2, h3, h4, h5, h6, p, blockquote, pre,\n\t\ta, abbr, acronym, address, big, cite, code,\n\t\tdel, dfn, em, img, ins, kbd, q, s, samp,\n\t\tsmall, strike, strong, sub, sup, tt, var,\n\t\tb, u, i, center,\n\t\tdl, dt, dd, ol, ul, li,\n\t\tfieldset, form, label, legend,\n\t\ttable, caption, tbody, tfoot, thead, tr, th, td,\n\t\tarticle, aside, canvas, details, embed, \n\t\tfigure, figcaption, footer, header, hgroup, \n\t\tmenu, nav, output, ruby, section, summary,\n\t\ttime, mark, audio, video {\n\t\t\tmargin: 0;\n\t\t\tpadding: 0;\n\t\t\tborder: 0;\n\t\t\tfont-size: 100%;\n\t\t\tfont: inherit;\n\t\t\tvertical-align: baseline;\n\t\t}\n\t\t/* HTML5 display-role reset for older browsers */\n\t\tarticle, aside, details, figcaption, figure, \n\t\tfooter, header, hgroup, menu, nav, section {\n\t\t\tdisplay: block;\n\t\t}\n\t\tbody {\n\t\t\tline-height: 1;\n\t\t}\n\t\tol, ul {\n\t\t\tlist-style: none;\n\t\t}\n\t\tblockquote, q {\n\t\t\tquotes: none;\n\t\t}\n\t\tblockquote:before, blockquote:after,\n\t\tq:before, q:after {\n\t\t\tcontent: '';\n\t\t\tcontent: none;\n\t\t}\n\t\ttable {\n\t\t\tborder-collapse: collapse;\n\t\t\tborder-spacing: 0;\n\t\t}\n\t}\n\t</style>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

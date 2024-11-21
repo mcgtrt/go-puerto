@@ -2,6 +2,8 @@ package api
 
 import (
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/mcgtrt/go-puerto/api/handlers"
@@ -27,15 +29,27 @@ func mountRoutes(r *chi.Mux, h *Handler) {
 }
 
 func mountFileServer(r *chi.Mux) {
+	wd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
 
+	static := filepath.Join(wd, "static")
+	fs := http.FileServer(http.Dir(static))
+	fileServer := http.StripPrefix("/f", fs)
+
+	r.Get("/f/*", func(w http.ResponseWriter, r *http.Request) {
+		fileServer.ServeHTTP(w, r)
+	})
 }
 
 func mountView(r *chi.Mux, h *handlers.ViewHandler) {
-	r.Get("/", handle(h.HandleHomePage))
+	r.Get("/", wrap(h.HandleHomePage))
 }
 
-// Use this function to convert APIFunc to http.HandlerFunc including Error Handling
-func handle(fn APIFunc) http.HandlerFunc {
+// Use this function to convert APIFunc to http.HandlerFunc
+// and handle possible errors with the Error Handler func
+func wrap(fn APIFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := handlers.NewCtx(w, r)
 

@@ -57,8 +57,7 @@ func NewDefaultConfig() (*Config, error) {
 
 // Configuration required for HTTP server
 type HTTPConfig struct {
-	Port int
-
+	Port           int
 	ImportAlpineJS bool
 }
 
