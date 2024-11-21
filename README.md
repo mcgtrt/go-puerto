@@ -3,16 +3,17 @@
 Tired creating project skeleton from scratch? Here's what you get with `go-puerto`
 
 - Domain Driven Design (DDD) Architecture
-- Built in context-driven routing with error handling
-- Automatic store connections (MongoDB, Postgres, Valkey)
-- Automatic configuration from .env
-- Compile-ready a-h/templ templates and layouts
-- Auto imported HTMX and (optional) Alpine.js
-- Internationalisation (website language + used currency)
-- Built-in AES encryption/decryption
-- Latest go-chi router
-- Web and file server
-- Ultra useful middlewares
+- Built in context-driven routing with global error handling
+- Automatic store connections (MongoDB, Postgres, Valkey - you chose which)
+- Automatic configuration from `.env` with validators
+- Compile-ready a-h/templ templates and layouts (with css reset)
+- Auto imported HTMX (Alpine.js is optional)
+- Internationalisation (one click website's language and currency switch)
+- Built-in AES encryption/decryption, advanced email, password, and other validators
+- Ready to go web and file server
+- Ultra useful middlewares with chi routing
+
+Full test coverage!!!
 
 ## Requirements
 
@@ -23,8 +24,9 @@ go install github.com/air-verse/air@latest
 go install github.com/a-h/templ/cmd/templ@latest
 ```
 
-This project skeleton requires .env file in the root directory. Configuration with required keys below.
-Please read this doc carefully as missing a single configuration item might result in app exiting from an error. The good side is that it's amazingly documented so you will always know what's missing (if you miss something).
+This project skeleton requires .env file in the root directory. Configuration with required keys are below.
+If you miss any piece of configuration and local setup - don't worry! It's thoroughly documented on every step and you will be guided with explicit messages that will help you get up in seconds!
+Reading this doc till the end is highly recommended.
 
 ## Core mechanisms
 
@@ -49,16 +51,11 @@ It's highly advised that you take a look into the utils folder as it's filled wi
 - advanced email address validator
 - password and name validator (with default MIN/MAX values you can easily adjust)
 
-What's more, this project is fully covered in tests. It doesn't cover the functions that are entry points for extending application like adding paths with methods to the router or constructor method for the global store and handler object. Beside those few methods this project has 100% test coverage.
+What's more, this project is fully covered in tests. It doesn't cover the functions that act as entry point for extending application like adding extending router paths or global store and handler constructors. Apart from those, this project has 99% test coverage.
 
 ## VSCode
 
-For debugging in VSCode:
-
-!!! Operation below may potentially lead to exposing your env vars publicly !!!
-The best solution to stop any data exposure of local variables, add folder `.vscode` to `.gitignore` file.
-
-If you want to debug in VSCode you need to insert all environmental variables in the .vscode/launch.json.
+If you want to debug in VSCode you need to insert all environmental variables in the .vscode/launch.json. Remember to add `/.vscode/` folder into `.gitignore` in order to never expose any fragile data.
 
 ## Golang Air Development
 
@@ -66,13 +63,12 @@ This project includes an entire .air.toml configuration. In order to use it, upd
 
 ```
 [build]
-bin = "./tmp/go-puerto" // replace with your own project name
-cmd = "make air-build"
+bin = "./tmp/REPLACE-ME-HERE"
 ```
 
 ## Environmental variables
 
-This project is fully equipped with basic setup with validation mechanisms. That's why it's vital to setup all these keys in local `.env` file in the root directory (or in the `launch.json` file if you're using it for VSCode):
+This project is fully equipped with basic setup and validation mechanisms. That's why it's vital to setup all these keys in local `.env` file in the root directory (or in the `launch.json` file if you're using it for VSCode):
 
 ```
 # GENERAL
