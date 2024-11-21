@@ -3,16 +3,19 @@ package api
 import (
 	"github.com/mcgtrt/go-puerto/api/handlers"
 	"github.com/mcgtrt/go-puerto/storage"
+	"github.com/mcgtrt/go-puerto/utils"
 )
 
 type APIFunc func(c *handlers.Ctx) error
 
 type Handler struct {
-	View *handlers.ViewHandler
+	Config *utils.HTTPConfig
+	View   *handlers.ViewHandler
 }
 
-func NewHandler(store *storage.Store) *Handler {
+func NewHandler(store *storage.Store, config *utils.HTTPConfig) *Handler {
 	return &Handler{
-		View: handlers.NewViewHandler(store),
+		Config: config,
+		View:   handlers.NewViewHandler(store),
 	}
 }

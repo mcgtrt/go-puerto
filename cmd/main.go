@@ -19,7 +19,7 @@ func main() {
 	if err != nil {
 		panic("store initialisation error:" + err.Error())
 	}
-	handler := api.NewHandler(store)
+	handler := api.NewHandler(store, config.HTTP)
 	router := api.NewRouter(handler)
 
 	fmt.Println("http server running on port", config.HTTP.Port)

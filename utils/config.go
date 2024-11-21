@@ -57,8 +57,9 @@ func NewDefaultConfig() (*Config, error) {
 
 // Configuration required for HTTP server
 type HTTPConfig struct {
-	Port           int
+	FileServerPath string
 	ImportAlpineJS bool
+	Port           int
 }
 
 func newDefaultHTTPConfig() (*HTTPConfig, error) {
@@ -71,6 +72,7 @@ func newDefaultHTTPConfig() (*HTTPConfig, error) {
 	if os.Getenv("IMPORT_ALPINE_JS") == "true" {
 		config.ImportAlpineJS = true
 	}
+	config.FileServerPath = os.Getenv("FILE_SERVER_PATH")
 	return config, nil
 }
 

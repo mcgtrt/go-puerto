@@ -24,11 +24,13 @@ func mountMiddlewares(r *chi.Mux) {
 }
 
 func mountRoutes(r *chi.Mux, h *Handler) {
-	mountFileServer(r)
+	if h.Config.FileServerPath != "" {
+		mountFileServer(r, h.Config.FileServerPath)
+	}
 	mountView(r, h.View)
 }
 
-func mountFileServer(r *chi.Mux) {
+func mountFileServer(r *chi.Mux, path string) {
 	wd, err := os.Getwd()
 	if err != nil {
 		panic(err)
@@ -36,9 +38,9 @@ func mountFileServer(r *chi.Mux) {
 
 	static := filepath.Join(wd, "static")
 	fs := http.FileServer(http.Dir(static))
-	fileServer := http.StripPrefix("/f", fs)
+	fileServer := http.StripPrefix("/"+path, fs)
 
-	r.Get("/f/*", func(w http.ResponseWriter, r *http.Request) {
+	r.Get("/"+path+"/*", func(w http.ResponseWriter, r *http.Request) {
 		fileServer.ServeHTTP(w, r)
 	})
 }
