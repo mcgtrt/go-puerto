@@ -75,7 +75,11 @@ func newDefaultHTTPConfig() (*HTTPConfig, error) {
 	if os.Getenv("IMPORT_ALPINE_JS") == "true" {
 		config.ImportAlpineJS = true
 	}
-	config.FileServerPath = os.Getenv("FILE_SERVER_PATH")
+	path := os.Getenv("FILE_SERVER_PATH")
+	if !IsURLSafe(path) {
+		return nil, errors.New("file server path is not URL safe")
+	}
+	config.FileServerPath = path
 	return config, nil
 }
 
@@ -125,14 +129,18 @@ func newDefaultMongoConfig() (*MongoConfig, error) {
 		host = "localhost"
 	}
 	port := os.Getenv("MONGO_PORT")
-	if _, err := strconv.Atoi(port); err != nil {
-		return nil, errors.New("invalid port for mongo connection")
-	}
 	if port == "" {
 		port = "27017"
 	}
+	if _, err := strconv.Atoi(port); err != nil {
+		return nil, errors.New("invalid port for mongo connection")
+	}
 	return &MongoConfig{
-		DBName: dbname,
+		DBName:   dbname,
+		Username: username,
+		Password: password,
+		Host:     host,
+		Port:     port,
 	}, nil
 }
 

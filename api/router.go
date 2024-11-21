@@ -32,24 +32,24 @@ func mountMiddlewares(r *chi.Mux) {
 // into this method to keep it simple and nicely organised
 func mountRoutes(r *chi.Mux, h *Handler) {
 	if h.Config.FileServerPath != "" {
-		mountFileServer(r, h.Config.FileServerPath)
+		mountFileServer(r, h.Config.FileServerPath, "static")
 	}
 	mountView(r, h.View)
 }
 
 // Ensure local file server is serving the files from the directory
 // that will have the same url path in accessing the file server
-func mountFileServer(r *chi.Mux, path string) {
+func mountFileServer(r *chi.Mux, pathURL, staticDir string) {
 	wd, err := os.Getwd()
 	if err != nil {
 		panic(err)
 	}
 
-	static := filepath.Join(wd, path)
+	static := filepath.Join(wd, staticDir)
 	fs := http.FileServer(http.Dir(static))
-	fileServer := http.StripPrefix("/"+path, fs)
+	fileServer := http.StripPrefix("/"+pathURL, fs)
 
-	r.Get("/"+path+"/*", func(w http.ResponseWriter, r *http.Request) {
+	r.Get("/"+pathURL+"/*", func(w http.ResponseWriter, r *http.Request) {
 		fileServer.ServeHTTP(w, r)
 	})
 }

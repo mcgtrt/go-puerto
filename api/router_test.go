@@ -27,7 +27,7 @@ func TestMountFileServer(t *testing.T) {
 
 	// Initialize the router and mount the file server
 	r := chi.NewRouter()
-	mountFileServer(r, "static_test")
+	mountFileServer(r, "static_test", "static_test")
 
 	// Test serving an existing file
 	req := httptest.NewRequest(http.MethodGet, "/static_test/test.txt", nil)
