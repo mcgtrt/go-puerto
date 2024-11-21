@@ -11,12 +11,37 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+const (
+	PROJECT_NAME                     = "PROJECT_NAME"
+	FILE_SERVER_PATH                 = "FILE_SERVER_PATH"
+	AES_SECRET                       = "AES_SECRET"
+	USE_DB_MONGO                     = "USE_DB_MONGO"
+	USE_DB_POSTGRES                  = "USE_DB_POSTGRES"
+	USE_DB_VALKEY                    = "USE_DB_VALKEY"
+	USE_JS_ALPINE                    = "USE_JS_ALPINE"
+	USE_MW_LOCALISATION              = "USE_MW_LOCALISATION"
+	USE_MW_SECURE_HEADERS            = "USE_MW_SECURE_HEADERS"
+	USE_MW_RATE_LIMIT                = "USE_MW_RATE_LIMIT"
+	USE_MW_LOG_AND_MONITOR_HEADERS   = "USE_MW_LOG_AND_MONITOR_HEADERS"
+	USE_MW_CORS                      = "USE_MW_CORS"
+	USE_MW_ETAG                      = "USE_MW_ETAG"
+	USE_MW_VALIDATE_SANITISE_HEADERS = "USE_MW_VALIDATE_SANITISE_HEADERS"
+	USE_MW_METHOD_OVERRIDE           = "USE_MW_METHOD_OVERRIDE"
+	HTTP_PORT                        = "HTTP_PORT"
+	MONGO_DB_NAME                    = "MONGO_DB_NAME"
+	MONGO_USERNAME                   = "MONGO_USERNAME"
+	MONGO_PASSWORD                   = "MONGO_PASSWORD"
+	MONGO_HOST                       = "MONGO_HOST"
+	MONGO_PORT                       = "MONGO_PORT"
+)
+
 // Holds global configuration sourced from local .env file
 type Config struct {
-	HTTP     *HTTPConfig
-	Mongo    *MongoConfig
-	Postgres *PostgresConfig
-	Valkey   *ValkeyConfig
+	HTTP       *HTTPConfig
+	Middleware *MiddlewareConfig
+	Mongo      *MongoConfig
+	Postgres   *PostgresConfig
+	Valkey     *ValkeyConfig
 }
 
 // Create new default config from the local .env file. If any part of the configuration
@@ -29,22 +54,23 @@ func NewDefaultConfig() (*Config, error) {
 		return nil, err
 	}
 	config.HTTP = http
+	config.Middleware = newDefaultMiddlewareConfig()
 
-	if os.Getenv("INCLUDE_MONGO") == "true" {
+	if os.Getenv(USE_DB_MONGO) == "true" {
 		mongo, err := newDefaultMongoConfig()
 		if err != nil {
 			return nil, err
 		}
 		config.Mongo = mongo
 	}
-	if os.Getenv("INCLUDE_POSTGRES") == "true" {
+	if os.Getenv(USE_DB_POSTGRES) == "true" {
 		postgres, err := newDefaultPostgresConfig()
 		if err != nil {
 			return nil, err
 		}
 		config.Postgres = postgres
 	}
-	if os.Getenv("INCLUDE_VALKEY") == "true" {
+	if os.Getenv(USE_DB_VALKEY) == "true" {
 		valkey, err := newDefaultValkeyConfig()
 		if err != nil {
 			return nil, err
@@ -64,7 +90,7 @@ type HTTPConfig struct {
 
 func newDefaultHTTPConfig() (*HTTPConfig, error) {
 	config := &HTTPConfig{}
-	port, err := strconv.Atoi(os.Getenv("HTTP_PORT"))
+	port, err := strconv.Atoi(os.Getenv(HTTP_PORT))
 	if err != nil {
 		return nil, errors.New("http port must be a valid port number")
 	}
@@ -72,15 +98,55 @@ func newDefaultHTTPConfig() (*HTTPConfig, error) {
 		return nil, errors.New("only registered and dynamic ports are allowed (1000 - 65535)")
 	}
 	config.Port = port
-	if os.Getenv("IMPORT_ALPINE_JS") == "true" {
+	if os.Getenv(USE_JS_ALPINE) == "true" {
 		config.ImportAlpineJS = true
 	}
-	path := os.Getenv("FILE_SERVER_PATH")
+	path := os.Getenv(FILE_SERVER_PATH)
 	if !IsURLSafe(path) {
 		return nil, errors.New("file server path is not URL safe")
 	}
 	config.FileServerPath = path
 	return config, nil
+}
+
+type MiddlewareConfig struct {
+	Localisation            bool
+	SecureHeaders           bool
+	RateLimit               bool
+	LogAndMonitorHeaders    bool
+	CORS                    bool
+	ETAG                    bool
+	ValidateSanitiseHeaders bool
+	MethodOverride          bool
+}
+
+func newDefaultMiddlewareConfig() *MiddlewareConfig {
+	cfg := &MiddlewareConfig{}
+	if loc := os.Getenv(USE_MW_LOCALISATION); loc == "true" {
+		cfg.Localisation = true
+	}
+	if sec := os.Getenv(USE_MW_SECURE_HEADERS); sec == "true" {
+		cfg.SecureHeaders = true
+	}
+	if rate := os.Getenv(USE_MW_RATE_LIMIT); rate == "true" {
+		cfg.RateLimit = true
+	}
+	if log := os.Getenv(USE_MW_LOG_AND_MONITOR_HEADERS); log == "true" {
+		cfg.LogAndMonitorHeaders = true
+	}
+	if cors := os.Getenv(USE_MW_CORS); cors == "true" {
+		cfg.CORS = true
+	}
+	if etag := os.Getenv(USE_MW_ETAG); etag == "true" {
+		cfg.ETAG = true
+	}
+	if val := os.Getenv(USE_MW_VALIDATE_SANITISE_HEADERS); val == "true" {
+		cfg.ValidateSanitiseHeaders = true
+	}
+	if overr := os.Getenv(USE_MW_METHOD_OVERRIDE); overr == "true" {
+		cfg.MethodOverride = true
+	}
+	return cfg
 }
 
 // Required configuration for creating mongodb connection
@@ -112,23 +178,23 @@ func (c *MongoConfig) Client() (*mongo.Client, error) {
 }
 
 func newDefaultMongoConfig() (*MongoConfig, error) {
-	dbname := os.Getenv("MONGO_DB_NAME")
+	dbname := os.Getenv(MONGO_DB_NAME)
 	if dbname == "" {
 		return nil, errors.New("mongo database name cannot be empty")
 	}
-	username := os.Getenv("MONGO_USERNAME")
+	username := os.Getenv(MONGO_USERNAME)
 	if username == "" {
 		return nil, errors.New("mongo username cannot be empty")
 	}
-	password := os.Getenv("MONGO_PASSWORD")
+	password := os.Getenv(MONGO_PASSWORD)
 	if password == "" {
 		return nil, errors.New("mongo password cannot be empty")
 	}
-	host := os.Getenv("MONGO_HOST")
+	host := os.Getenv(MONGO_HOST)
 	if host == "" {
 		host = "localhost"
 	}
-	port := os.Getenv("MONGO_PORT")
+	port := os.Getenv(MONGO_PORT)
 	if port == "" {
 		port = "27017"
 	}

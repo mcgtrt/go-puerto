@@ -8,31 +8,49 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/mcgtrt/go-puerto/api/handlers"
 	"github.com/mcgtrt/go-puerto/api/middleware"
+	"github.com/mcgtrt/go-puerto/utils"
 )
 
 // API func signature for the handler methods
 type APIFunc func(c *handlers.Ctx) error
 
 // Returns a fully mounted Chi router
-func NewRouter(h *Handler) *chi.Mux {
+func NewRouter(h *Handler, cfg *utils.Config) *chi.Mux {
 	r := chi.NewRouter()
 
-	mountMiddlewares(r)
-	mountRoutes(r, h)
+	mountMiddlewares(r, cfg.Middleware)
+	mountRoutes(r, h, cfg.HTTP)
 
 	return r
 }
 
 // The place to mount all the middlewares
-func mountMiddlewares(r *chi.Mux) {
-	r.Use(middleware.LocalisationMiddleware)
+func mountMiddlewares(r *chi.Mux, cfg *utils.MiddlewareConfig) {
+	if cfg.Localisation {
+		r.Use(middleware.LocalisationMiddleware)
+	}
+	// TODO: For the scope of the next release
+	// if cfg.SecureHeaders {
+	// }
+	// if cfg.RateLimit {
+	// }
+	// if cfg.LogAndMonitorHeaders {
+	// }
+	// if cfg.CORS {
+	// }
+	// if cfg.ETAG {
+	// }
+	// if cfg.ValidateSanitiseHeaders {
+	// }
+	// if cfg.MethodOverride {
+	// }
 }
 
 // This is the global routes mount entry. Add new mountSomethig
 // into this method to keep it simple and nicely organised
-func mountRoutes(r *chi.Mux, h *Handler) {
-	if h.Config.FileServerPath != "" {
-		mountFileServer(r, h.Config.FileServerPath, "static")
+func mountRoutes(r *chi.Mux, h *Handler, cfg *utils.HTTPConfig) {
+	if cfg.FileServerPath != "" {
+		mountFileServer(r, cfg.FileServerPath, "static")
 	}
 	mountView(r, h.View)
 }
