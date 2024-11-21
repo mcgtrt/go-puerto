@@ -2,7 +2,7 @@ root = "."
 tmp_dir = "tmp"
 
 [build]
-bin = "./tmp/${PROJECT_NAME}"
+bin = "./tmp/go-puerto"
 cmd = "make air-build"
 
 delay = 100
