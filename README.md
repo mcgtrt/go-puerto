@@ -9,6 +9,7 @@ Tired creating project skeleton from scratch? Here's what you get with `go-puert
 - Compile-ready a-h/templ templates and layouts
 - Auto imported HTMX and (optional) Alpine.js
 - Internationalisation (website language + used currency)
+- Built-in AES encryption/decryption
 - Web and file server
 - Ultra useful middlewares
 
