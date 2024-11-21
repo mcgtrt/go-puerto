@@ -6,8 +6,6 @@ import (
 	"github.com/mcgtrt/go-puerto/utils"
 )
 
-type APIFunc func(c *handlers.Ctx) error
-
 type Handler struct {
 	Config *utils.HTTPConfig
 	View   *handlers.ViewHandler

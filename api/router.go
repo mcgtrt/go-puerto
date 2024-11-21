@@ -10,6 +10,8 @@ import (
 	"github.com/mcgtrt/go-puerto/api/middleware"
 )
 
+type APIFunc func(c *handlers.Ctx) error
+
 func NewRouter(h *Handler) *chi.Mux {
 	r := chi.NewRouter()
 
