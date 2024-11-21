@@ -3,13 +3,13 @@ package utils
 import (
 	"context"
 
-	"github.com/mcgtrt/go-puerto/api/middleware"
+	"github.com/mcgtrt/go-puerto/types"
 )
 
-func GetLocale(ctx context.Context) (string, string) {
-	lang, _ := ctx.Value(middleware.LocaleCtx{}).(string)
-	currency, _ := ctx.Value(middleware.CurrencyCtx{}).(string)
-	return lang, currency
+func GetLocale(ctx context.Context) (language string, currency string) {
+	language, _ = ctx.Value(types.LanguageCtxKey{}).(string)
+	currency, _ = ctx.Value(types.CurrencyCtxKey{}).(string)
+	return
 }
 
 func Ptr[T any](v T) *T {

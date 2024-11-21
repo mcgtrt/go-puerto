@@ -3,15 +3,14 @@ package middleware
 import (
 	"context"
 	"net/http"
+
+	"github.com/mcgtrt/go-puerto/types"
 )
 
 const (
 	DEFAULT_LANGUAGE = "en"
 	DEFAULT_CURRENCY = "GBP"
 )
-
-type LocaleCtx struct{}
-type CurrencyCtx struct{}
 
 func LocaleMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -29,8 +28,8 @@ func LocaleMiddleware(next http.Handler) http.Handler {
 			}
 		}
 
-		ctx := context.WithValue(r.Context(), LocaleCtx{}, lang)
-		ctx = context.WithValue(ctx, CurrencyCtx{}, currency.Value)
+		ctx := context.WithValue(r.Context(), types.LanguageCtxKey{}, lang)
+		ctx = context.WithValue(ctx, types.CurrencyCtxKey{}, currency.Value)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

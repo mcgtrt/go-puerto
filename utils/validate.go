@@ -15,15 +15,41 @@ const (
 )
 
 func IsEmailCorrect(email string) bool {
-	var (
-		emailRegex = regexp.MustCompile(`^[a-z0-9._%\$+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
-		lower      = strings.ToLower(email)
-	)
-	return emailRegex.MatchString(lower)
+	regex := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,10}$`
+	matched, _ := regexp.MatchString(regex, email)
+	if !matched {
+		return false
+	}
+
+	// Additional programmatic checks
+	parts := strings.Split(email, "@")
+	local, domain := parts[0], parts[1]
+
+	// Ensure no leading or trailing dots in the local part
+	if strings.HasPrefix(local, ".") || strings.HasSuffix(local, ".") {
+		return false
+	}
+
+	// Ensure no leading or trailing hyphens in the domain part
+	if strings.HasPrefix(domain, "-") || strings.HasSuffix(domain, "-") {
+		return false
+	}
+
+	// Ensure no consecutive dots in the domain part
+	if strings.Contains(domain, "..") {
+		return false
+	}
+
+	return true
 }
 
 func IsNameCorrect(name string) bool {
-	if len(name) < MIN_NAME_LEN || len(name) > MAX_NAME_LEN {
+	if MIN_NAME_LEN > 0 {
+		if len(name) < MIN_NAME_LEN {
+			return false
+		}
+	}
+	if len(name) > MAX_NAME_LEN {
 		return false
 	}
 	return true
@@ -47,9 +73,5 @@ func IsPasswordCorrect(pwd string) bool {
 		}
 	}
 
-	if !number || !upper || !special {
-		return false
-	}
-
-	return true
+	return number && upper && special
 }
