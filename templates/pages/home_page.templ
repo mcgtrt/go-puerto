@@ -1,5 +1,9 @@
 package pages 
 
-templ HomePage() {
+import "github.com/mcgtrt/go-puerto/templates/layout"
 
+templ HomePage(lang string) {
+	@layout.Base("Home Page", lang) {
+		<div>Hello, Space!</div>
+	}
 }

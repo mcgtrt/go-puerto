@@ -3,6 +3,7 @@ package handlers
 import (
 	"github.com/mcgtrt/go-puerto/storage"
 	"github.com/mcgtrt/go-puerto/templates/pages"
+	"github.com/mcgtrt/go-puerto/utils"
 )
 
 type ViewHandler struct {
@@ -16,5 +17,6 @@ func NewViewHandler(store *storage.Store) *ViewHandler {
 }
 
 func (h *ViewHandler) HandleHomePage(c *Ctx) error {
-	return c.Render(pages.HomePage())
+	lang, _ := utils.GetLocale(c.Context)
+	return c.Render(pages.HomePage(lang))
 }
