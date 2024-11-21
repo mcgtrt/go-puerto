@@ -23,10 +23,11 @@ go install github.com/a-h/templ/cmd/templ@latest
 
 This project skeleton requires .env file in the root directory
 
-## What next
+## What's next
 
-!!! This operation will may potentially lead to exposing your env vars to public !!!
+For debugging in VSCode:
 
+!!! Operation below may potentially lead to exposing your env vars publicly !!!
 The best solution to stop any data exposure of local variables, add folder `.vscode` to `.gitignore` file.
 
 If you want to debug in VSCode you need to insert all environmental variables in the .vscode/launch.json.
