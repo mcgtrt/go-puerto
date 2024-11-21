@@ -12,7 +12,7 @@ const (
 	DEFAULT_CURRENCY = "GBP"
 )
 
-func LocaleMiddleware(next http.Handler) http.Handler {
+func LocalisationMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		lang := r.Header.Get("Accept-Language")
 		if lang == "" {

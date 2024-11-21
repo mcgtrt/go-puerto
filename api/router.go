@@ -25,7 +25,7 @@ func NewRouter(h *Handler) *chi.Mux {
 
 // The place to mount all the middlewares
 func mountMiddlewares(r *chi.Mux) {
-	r.Use(middleware.LocaleMiddleware)
+	r.Use(middleware.LocalisationMiddleware)
 }
 
 // This is the global routes mount entry. Add new mountSomethig
