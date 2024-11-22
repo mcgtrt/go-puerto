@@ -28,6 +28,17 @@ This project skeleton requires .env file in the root directory. Configuration wi
 If you miss any piece of configuration and local setup - don't worry! It's thoroughly documented on every step and you will be guided with explicit messages that will help you get up in seconds!
 Reading this doc till the end is highly recommended.
 
+## Middlewares
+
+- CORS
+- Rate Limiter (Automatic burst and limit config)
+- Localisation (Automatic Language and Currency setting into context values)
+- Secure Headers (Set secure headers to avoid nasty attacks)
+- Validate Headers (Content-Type validation)
+- ETAG (Limit bandwith transfer with cached content)
+- Headers logging
+- Method Override
+
 ## Core mechanisms
 
 In order to speed up your development process, this project is fully equipped with amazing technologies and code pieces that will not only skyrocket your development speed, but also equip with fully tested and super helpful tools:
