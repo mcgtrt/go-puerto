@@ -9,6 +9,7 @@ import (
 	"github.com/mcgtrt/go-puerto/api/handlers"
 	"github.com/mcgtrt/go-puerto/api/middleware"
 	"github.com/mcgtrt/go-puerto/utils"
+	"golang.org/x/time/rate"
 )
 
 // API func signature for the handler methods
@@ -29,21 +30,30 @@ func mountMiddlewares(r *chi.Mux, cfg *utils.MiddlewareConfig) {
 	if cfg.Localisation {
 		r.Use(middleware.LocalisationMiddleware)
 	}
-	// TODO: For the scope of the next release
-	// if cfg.SecureHeaders {
-	// }
-	// if cfg.RateLimit {
-	// }
-	// if cfg.LogAndMonitorHeaders {
-	// }
-	// if cfg.CORS {
-	// }
-	// if cfg.ETAG {
-	// }
-	// if cfg.ValidateSanitiseHeaders {
-	// }
-	// if cfg.MethodOverride {
-	// }
+	if cfg.SecureHeaders {
+		r.Use(middleware.SecureHeadersMiddleware)
+	}
+	if cfg.RateLimit {
+		if cfg.RateLimiterLimit != nil && cfg.RateLimiterBurst != nil {
+			middleware.Limiter = rate.NewLimiter(rate.Limit(*cfg.RateLimiterLimit), *cfg.RateLimiterBurst)
+		}
+		r.Use(middleware.RateLimitMiddleware)
+	}
+	if cfg.LogAndMonitorHeaders {
+		r.Use(middleware.LogHeadersMiddleware)
+	}
+	if cfg.CORS {
+		r.Use(middleware.CORSMiddleware)
+	}
+	if cfg.ETAG {
+		r.Use(middleware.ETagMiddleware)
+	}
+	if cfg.ValidateSanitiseHeaders {
+		r.Use(middleware.ValidateHeadersMiddleware)
+	}
+	if cfg.MethodOverride {
+		r.Use(middleware.MethodOverrideMiddleware)
+	}
 }
 
 // This is the global routes mount entry. Add new mountSomethig

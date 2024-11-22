@@ -22,6 +22,8 @@ const (
 	USE_MW_LOCALISATION              = "USE_MW_LOCALISATION"
 	USE_MW_SECURE_HEADERS            = "USE_MW_SECURE_HEADERS"
 	USE_MW_RATE_LIMIT                = "USE_MW_RATE_LIMIT"
+	MW_RATE_LIMITER_LIMIT            = "MW_RATE_LIMITER_LIMIT"
+	MW_RATE_LIMITER_BURST            = "MW_RATE_LIMITER_BURST"
 	USE_MW_LOG_AND_MONITOR_HEADERS   = "USE_MW_LOG_AND_MONITOR_HEADERS"
 	USE_MW_CORS                      = "USE_MW_CORS"
 	USE_MW_ETAG                      = "USE_MW_ETAG"
@@ -34,6 +36,34 @@ const (
 	MONGO_HOST                       = "MONGO_HOST"
 	MONGO_PORT                       = "MONGO_PORT"
 )
+
+func AllConfigKeys() []string {
+	return []string{
+		PROJECT_NAME,
+		FILE_SERVER_PATH,
+		AES_SECRET,
+		USE_DB_MONGO,
+		USE_DB_POSTGRES,
+		USE_DB_VALKEY,
+		USE_JS_ALPINE,
+		USE_MW_LOCALISATION,
+		USE_MW_SECURE_HEADERS,
+		USE_MW_RATE_LIMIT,
+		MW_RATE_LIMITER_LIMIT,
+		MW_RATE_LIMITER_BURST,
+		USE_MW_LOG_AND_MONITOR_HEADERS,
+		USE_MW_CORS,
+		USE_MW_ETAG,
+		USE_MW_VALIDATE_SANITISE_HEADERS,
+		USE_MW_METHOD_OVERRIDE,
+		HTTP_PORT,
+		MONGO_DB_NAME,
+		MONGO_USERNAME,
+		MONGO_PASSWORD,
+		MONGO_HOST,
+		MONGO_PORT,
+	}
+}
 
 // Holds global configuration sourced from local .env file
 type Config struct {
@@ -54,7 +84,11 @@ func NewDefaultConfig() (*Config, error) {
 		return nil, err
 	}
 	config.HTTP = http
-	config.Middleware = newDefaultMiddlewareConfig()
+	mw, err := newDefaultMiddlewareConfig()
+	if err != nil {
+		return nil, err
+	}
+	config.Middleware = mw
 
 	if os.Getenv(USE_DB_MONGO) == "true" {
 		mongo, err := newDefaultMongoConfig()
@@ -113,6 +147,8 @@ type MiddlewareConfig struct {
 	Localisation            bool
 	SecureHeaders           bool
 	RateLimit               bool
+	RateLimiterLimit        *int
+	RateLimiterBurst        *int
 	LogAndMonitorHeaders    bool
 	CORS                    bool
 	ETAG                    bool
@@ -120,7 +156,7 @@ type MiddlewareConfig struct {
 	MethodOverride          bool
 }
 
-func newDefaultMiddlewareConfig() *MiddlewareConfig {
+func newDefaultMiddlewareConfig() (*MiddlewareConfig, error) {
 	cfg := &MiddlewareConfig{}
 	if loc := os.Getenv(USE_MW_LOCALISATION); loc == "true" {
 		cfg.Localisation = true
@@ -130,6 +166,29 @@ func newDefaultMiddlewareConfig() *MiddlewareConfig {
 	}
 	if rate := os.Getenv(USE_MW_RATE_LIMIT); rate == "true" {
 		cfg.RateLimit = true
+	}
+	if limit := os.Getenv(MW_RATE_LIMITER_LIMIT); limit != "" {
+		l, err := strconv.Atoi(limit)
+		if err != nil {
+			return nil, errors.New("rate limiter limit must be a number")
+		}
+		if l > 0 {
+			cfg.RateLimiterLimit = &l
+		}
+	}
+	if burst := os.Getenv(MW_RATE_LIMITER_BURST); burst != "" {
+		b, err := strconv.Atoi(burst)
+		if err != nil {
+			return nil, errors.New("rate limiter burst must be a number")
+		}
+		if b > 0 {
+			cfg.RateLimiterBurst = &b
+		}
+	}
+	if cfg.RateLimiterLimit != nil && cfg.RateLimiterBurst != nil {
+		if *cfg.RateLimiterLimit > *cfg.RateLimiterBurst {
+			return nil, errors.New("rate limiter limit cannot be bigger than limiter burst")
+		}
 	}
 	if log := os.Getenv(USE_MW_LOG_AND_MONITOR_HEADERS); log == "true" {
 		cfg.LogAndMonitorHeaders = true
@@ -146,7 +205,7 @@ func newDefaultMiddlewareConfig() *MiddlewareConfig {
 	if overr := os.Getenv(USE_MW_METHOD_OVERRIDE); overr == "true" {
 		cfg.MethodOverride = true
 	}
-	return cfg
+	return cfg, nil
 }
 
 // Required configuration for creating mongodb connection

@@ -8,39 +8,64 @@ import (
 )
 
 func TestDefaultConfig(t *testing.T) {
-	ts := "true"
+	for _, key := range AllConfigKeys() {
+		defer os.Unsetenv(key)
+	}
 	// Test HTTP Config
-	c, err := NewDefaultConfig()
+	ts := "true"
 	errInvalidPortString := "http port must be a valid port number"
-	assertConfigNil(t, c, err, errInvalidPortString)
-
-	os.Setenv(HTTP_PORT, "invalid")
-	defer os.Unsetenv(HTTP_PORT)
-	c, err = NewDefaultConfig()
-	assertConfigNil(t, c, err, errInvalidPortString)
-
 	errInvalidPortRange := "only registered and dynamic ports are allowed (1000 - 65535)"
-	os.Setenv(HTTP_PORT, "15")
-	c, err = NewDefaultConfig()
-	assertConfigNil(t, c, err, errInvalidPortRange)
-
-	os.Setenv(HTTP_PORT, "1512312")
-	c, err = NewDefaultConfig()
-	assertConfigNil(t, c, err, errInvalidPortRange)
+	httptests := []struct {
+		name string
+		key  string
+		val  string
+		err  string
+	}{
+		{
+			"start",
+			"",
+			"",
+			errInvalidPortString,
+		},
+		{
+			"invalid http port",
+			HTTP_PORT,
+			"invalid",
+			errInvalidPortString,
+		},
+		{
+			"invalid port range - too little",
+			HTTP_PORT,
+			"15",
+			errInvalidPortRange,
+		},
+		{
+			"invalid port range - too big",
+			HTTP_PORT,
+			"1512312",
+			errInvalidPortRange,
+		},
+	}
+	for _, tt := range httptests {
+		if tt.key != "" {
+			os.Setenv(tt.key, tt.val)
+			defer os.Unsetenv(tt.key)
+		}
+		c, err := NewDefaultConfig()
+		assertConfigNil(t, c, err, tt.err)
+	}
 
 	os.Setenv(HTTP_PORT, "3000")
-	c, err = NewDefaultConfig()
+	c, err := NewDefaultConfig()
 	assert.Equal(t, 3000, c.HTTP.Port, "expected the same http port")
 	assert.Nil(t, err, "expected no errors")
 
 	os.Setenv(FILE_SERVER_PATH, "non url safe path")
-	defer os.Unsetenv(FILE_SERVER_PATH)
 	c, err = NewDefaultConfig()
 	assertConfigNil(t, c, err, "file server path is not URL safe")
 
 	os.Setenv(FILE_SERVER_PATH, "static")
 	os.Setenv(USE_JS_ALPINE, ts)
-	defer os.Unsetenv(USE_JS_ALPINE)
 	c, err = NewDefaultConfig()
 	assert.True(t, c.HTTP.ImportAlpineJS, "should be true")
 	assert.Equal(t, "static", c.HTTP.FileServerPath)
@@ -62,7 +87,6 @@ func TestDefaultConfig(t *testing.T) {
 	}
 	for _, mw := range mws {
 		os.Setenv(mw, ts)
-		defer os.Unsetenv(mw)
 	}
 	c, err = NewDefaultConfig()
 	assert.True(t, c.Middleware.Localisation, "expected localisation mw true")
@@ -75,9 +99,27 @@ func TestDefaultConfig(t *testing.T) {
 	assert.True(t, c.Middleware.MethodOverride, "expected method override mw true")
 	assert.Nil(t, err, "expected no errors")
 
+	os.Setenv(MW_RATE_LIMITER_LIMIT, "invalid")
+	os.Setenv(MW_RATE_LIMITER_BURST, "invalidtoo")
+	c, err = NewDefaultConfig()
+	assertConfigNil(t, c, err, "rate limiter limit must be a number")
+
+	os.Setenv(MW_RATE_LIMITER_LIMIT, "50")
+	c, err = NewDefaultConfig()
+	assertConfigNil(t, c, err, "rate limiter burst must be a number")
+
+	os.Setenv(MW_RATE_LIMITER_BURST, "10")
+	c, err = NewDefaultConfig()
+	assertConfigNil(t, c, err, "rate limiter limit cannot be bigger than limiter burst")
+
+	os.Setenv(MW_RATE_LIMITER_BURST, "100")
+	c, err = NewDefaultConfig()
+	assert.Equal(t, 50, *c.Middleware.RateLimiterLimit, "expected the same rate limiter limit")
+	assert.Equal(t, 100, *c.Middleware.RateLimiterBurst, "expected the same rate limiter burst")
+	assert.Nil(t, err, "expected no errors")
+
 	// Test Mongo Config
 	os.Setenv(USE_DB_MONGO, "invalid")
-	defer os.Unsetenv(USE_DB_MONGO)
 	c, err = NewDefaultConfig()
 	assert.Nil(t, c.Mongo, "expected nil mongo config")
 	assert.Nil(t, err, "expected no errors")
@@ -87,17 +129,14 @@ func TestDefaultConfig(t *testing.T) {
 	assertConfigNil(t, c, err, "mongo database name cannot be empty")
 
 	os.Setenv(MONGO_DB_NAME, "testname")
-	defer os.Unsetenv(MONGO_DB_NAME)
 	c, err = NewDefaultConfig()
 	assertConfigNil(t, c, err, "mongo username cannot be empty")
 
 	os.Setenv(MONGO_USERNAME, "testusername")
-	defer os.Unsetenv(MONGO_USERNAME)
 	c, err = NewDefaultConfig()
 	assertConfigNil(t, c, err, "mongo password cannot be empty")
 
 	os.Setenv(MONGO_PASSWORD, "password")
-	defer os.Unsetenv(MONGO_PASSWORD)
 	c, err = NewDefaultConfig()
 	assert.Equal(t, "testname", c.Mongo.DBName, "expected the same mongo database name")
 	assert.Equal(t, "testusername", c.Mongo.Username, "expected the same usernames")
@@ -107,13 +146,11 @@ func TestDefaultConfig(t *testing.T) {
 	assert.Nil(t, err, "expected no errors")
 
 	os.Setenv(MONGO_PORT, "invalid port")
-	defer os.Unsetenv(MONGO_PORT)
 	c, err = NewDefaultConfig()
 	assertConfigNil(t, c, err, "invalid port for mongo connection")
 
 	os.Setenv(MONGO_PORT, "123456")
 	os.Setenv(MONGO_HOST, "someotherhost")
-	defer os.Unsetenv(MONGO_HOST)
 	c, err = NewDefaultConfig()
 	assert.Equal(t, "123456", c.Mongo.Port, "expected the same ports")
 	assert.Equal(t, "someotherhost", c.Mongo.Host, "expected the same hosts")
@@ -121,7 +158,6 @@ func TestDefaultConfig(t *testing.T) {
 
 	// Test Postgres Config
 	os.Setenv(USE_DB_POSTGRES, "invalid")
-	defer os.Unsetenv(USE_DB_POSTGRES)
 	c, err = NewDefaultConfig()
 	assert.Nil(t, c.Postgres, "expected nil postgres config")
 	assert.Nil(t, err, "expected no errors")
@@ -133,7 +169,6 @@ func TestDefaultConfig(t *testing.T) {
 
 	// Test Valkey Config
 	os.Setenv(USE_DB_VALKEY, "invalid")
-	defer os.Unsetenv(USE_DB_VALKEY)
 	c, err = NewDefaultConfig()
 	assert.Nil(t, c.Valkey, "expected nil valkey config")
 	assert.Nil(t, err, "expected no errors")
