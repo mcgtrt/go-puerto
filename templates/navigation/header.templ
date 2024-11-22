@@ -1,0 +1,144 @@
+package navigation 
+
+templ Header() {
+	@headerCss()
+	<header class="site-header">
+		<div class="container">
+			<div class="logo">
+				<a href="#">Logo</a>
+			</div>
+			<nav class="nav">
+				<ul class="nav-links">
+					<li><a href="#">Home</a></li>
+					<li><a href="#">About</a></li>
+					<li><a href="#">Services</a></li>
+					<li><a href="#">Contact</a></li>
+				</ul>
+			</nav>
+		</div>
+	</header>
+}
+
+templ headerCss() {
+	<style>
+		.site-header {
+			background-color: var(--primary-color);
+			color: var(--white);
+			padding: 10px 0;
+			position: relative;
+		}
+
+		.site-header .container {
+			display: flex;
+		}
+
+		.site-header .logo a {
+			color: var(--white);
+			font-size: 1.5rem;
+			font-weight: bold;
+			text-decoration: none;
+		}
+
+		.nav {
+			margin-left: auto;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.nav-links {
+			list-style: none;
+			padding: 0;
+			margin: 0;
+			display: flex;
+			gap: 20px;
+		}
+
+		.nav-links a {
+			color: var(--white);
+			text-decoration: none;
+			font-size: 1rem;
+			font-weight: 500;
+			transition: color 0.3s;
+		}
+
+		.nav-links a:hover {
+			color: var(--secondary-color);
+		}
+
+		.nav-toggle {
+			display: none;
+			background: none;
+			border: none;
+			cursor: pointer;
+		}
+
+		.nav-toggle .hamburger {
+			display: block;
+			width: 25px;
+			height: 3px;
+			background: var(--white);
+			border-radius: 2px;
+			position: relative;
+		}
+
+		.nav-toggle .hamburger::before,
+		.nav-toggle .hamburger::after {
+			content: '';
+			position: absolute;
+			width: 100%;
+			height: 3px;
+			background: var(--white);
+			border-radius: 2px;
+			transition: all 0.3s;
+		}
+
+		.nav-toggle .hamburger::before {
+			top: -8px;
+		}
+
+		.nav-toggle .hamburger::after {
+			bottom: -8px;
+		}
+
+		/* Responsive Design */
+		@media (max-width: 768px) {
+			.nav-links {
+				flex-direction: column;
+				display: none;
+				background-color: var(--primary-color);
+				position: absolute;
+				top: 100%;
+				right: 0;
+				width: 100%;
+				padding: 10px 0;
+			}
+
+			.nav-links a {
+				padding: 10px 20px;
+				display: block;
+				text-align: center;
+			}
+
+			.nav-links.active {
+				display: flex;
+			}
+
+			.nav-toggle {
+				display: block;
+			}
+		}
+
+		@media (min-width: 769px) and (max-width: 1024px) {
+			.nav-links a {
+				font-size: 0.9rem;
+			}
+		}
+
+		@media (min-width: 1025px) {
+			.nav-links a {
+				font-size: 1rem;
+			}
+		}
+	</style>
+}

@@ -1,0 +1,169 @@
+package navigation 
+
+templ Footer() {
+	@footerCSS()
+	<footer class="site-footer">
+		<div class="container">
+			<div class="footer-sections">
+				<div class="footer-column">
+					<h4>Our Mission</h4>
+					<p>go-puerto is a project skeleton aiming to skyrocket speed of creating your new GO + HTMX + TEMPL projects.</p>
+				</div>
+				<div class="footer-column">
+					<h4>Quick Links</h4>
+					<ul>
+						<li><a href="#home">Home</a></li>
+						<li><a href="#about">About</a></li>
+						<li><a href="#services">Services</a></li>
+						<li><a href="#contact">Contact</a></li>
+					</ul>
+				</div>
+				<div class="footer-column">
+					<h4>Contact</h4>
+					<div class="flex">
+						<div class="footer-column mw-80 mr-8">
+							<p>Email:</p>
+							<p>Phone:</p>
+							<p>Address:</p>
+						</div>
+						<div class="footer-column">
+							<p>info@yourdomain.com</p>
+							<p>+1 234 567 890</p>
+							<p>123 Professional Street, City, Country</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="footer-bottom">
+				<p>&copy; 2024 go-puerto. All rights reserved.</p>
+				<ul class="social-links">
+					<li><a href="#" aria-label="Facebook">Facebook</a></li>
+					<li><a href="#" aria-label="Twitter">Twitter</a></li>
+					<li><a href="#" aria-label="LinkedIn">LinkedIn</a></li>
+				</ul>
+			</div>
+		</div>
+	</footer>
+}
+
+templ footerCSS() {
+	<style>
+		.site-footer {
+			background-color: var(--primary-color);
+			color: var(--white);
+			padding: 40px 20px;
+		}
+
+		.footer-sections {
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: space-between;
+			gap: 20px;
+		}
+
+		.footer-column {
+			flex: 1 1 calc(33.333% - 20px);
+		}
+
+		.footer-column h4 {
+			font-size: 1.2rem;
+			margin-bottom: 15px;
+			color: var(--secondary-color);
+		}
+
+		.footer-column p,
+		.footer-column ul {
+			font-size: 0.9rem;
+			line-height: 1.6;
+			margin: 0;
+		}
+
+		.footer-column ul {
+			list-style: none;
+			padding: 0;
+		}
+
+		.footer-column ul li {
+			margin-bottom: 10px;
+		}
+
+		.footer-column ul li a {
+			color: var(--white);
+			text-decoration: none;
+			transition: color 0.3s;
+		}
+
+		.footer-column ul li a:hover {
+			color: var(--secondary-color);
+		}
+
+		.footer-bottom {
+			margin-top: 30px;
+			text-align: center;
+			font-size: 0.8rem;
+			border-top: 1px solid rgba(255, 255, 255, 0.2);
+			padding-top: 20px;
+		}
+
+		.footer-bottom p {
+			margin: 0;
+		}
+
+		.social-links {
+			list-style: none;
+			padding: 0;
+			display: flex;
+			justify-content: center;
+			gap: 15px;
+			margin-top: 10px;
+		}
+
+		.social-links li a {
+			color: var(--white);
+			text-decoration: none;
+			font-size: 1rem;
+			transition: color 0.3s;
+		}
+
+		.social-links li a:hover {
+			color: var(--secondary-color);
+		}
+
+		/* Responsive Design */
+		@media (max-width: 768px) {
+			.footer-sections {
+				flex-direction: column;
+			}
+
+			.footer-column {
+				flex: 1 1 100%;
+			}
+
+			.footer-bottom {
+				text-align: center;
+			}
+		}
+
+		@media (min-width: 769px) and (max-width: 1024px) {
+			.footer-column h4 {
+				font-size: 1.1rem;
+			}
+
+			.footer-column p,
+			.footer-column ul {
+				font-size: 0.85rem;
+			}
+			}
+
+			@media (min-width: 1025px) {
+			.footer-column h4 {
+				font-size: 1.2rem;
+			}
+
+			.footer-column p,
+			.footer-column ul {
+				font-size: 0.9rem;
+			}
+		}
+	</style>
+}

@@ -1,0 +1,62 @@
+package css 
+
+templ CSS_Global() {
+	<style>
+        :root {
+        --primary-color: #004c99;
+        --secondary-color: #0088cc; 
+        --background-color: #f5f8fa; 
+        --text-color: #333333; 
+        --white: #ffffff;
+        --hover-color: #005bb5;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Ensure footer sticks to the bottom */
+        body.body-layout {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Full viewport height */
+            margin: 0;
+        }
+
+        header.site-header {
+            flex: 0 0 auto; /* Header does not grow or shrink */
+        }
+
+        main.content {
+            flex: 1 0 auto; /* Main content takes up remaining space */
+        }
+
+        footer.site-footer {
+            flex: 0 0 auto; /* Footer does not grow or shrink */
+            background-color: var(--primary-color);
+            color: var(--white);
+            padding: 20px 0;
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .mw-80 {
+            max-width: 80px;
+        }
+
+        .mr-8 {
+            margin-rigth: 8px;
+        }
+	</style>
+}

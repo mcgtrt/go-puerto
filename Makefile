@@ -5,7 +5,7 @@ dev:
 
 build: 
 	@templ generate
-	@go build -o ./bin/${PROJECT_NAME} ./cmd/main.go
+	@go build -o ./bin/${PROJECT_NAME} ./cmd/app/main.go
 
 run: build 
 	@./bin/${PROJECT_NAME} 
@@ -21,4 +21,4 @@ air:
 
 air-build:
 	@templ generate
-	@go build -o ./tmp/${PROJECT_NAME} ./cmd/main.go
+	@go build -o ./tmp/${PROJECT_NAME} ./cmd/app/main.go
