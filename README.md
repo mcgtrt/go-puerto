@@ -17,7 +17,13 @@ Full test coverage!!!
 
 ## Requirements
 
-Make sure you have air and templ installed:
+Make sure you have all infrastructure docker images running. To select images you need for the project, simply modify the `docker-compose.yaml`, then run:
+
+```
+docker compoose up -d
+```
+
+For development, you need air and templ installed:
 
 ```
 go install github.com/air-verse/air@latest
