@@ -6,15 +6,15 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"golang.org/x/time/rate"
 )
 
 func TestRateLimitMiddleware(t *testing.T) {
-	// Configure rate limiter settings for the test
+	// Adjust rate limiter for testing
 	originalLimit := DEFAULT_RATE_LIMITER_LIMIT
 	originalBurst := DEFAULT_RATE_LIMITER_BURST
 
-	// Adjust limiter for testing
 	DEFAULT_RATE_LIMITER_LIMIT = 2 // Limit to 2 requests per second
 	DEFAULT_RATE_LIMITER_BURST = 2 // Allow up to 2 bursts
 	Limiter = rate.NewLimiter(DEFAULT_RATE_LIMITER_LIMIT, DEFAULT_RATE_LIMITER_BURST)
@@ -32,34 +32,42 @@ func TestRateLimitMiddleware(t *testing.T) {
 	})
 	rateLimitedHandler := RateLimitMiddleware(handler)
 
-	// Helper function to send a request
-	sendRequest := func() *httptest.ResponseRecorder {
+	t.Run("Within limit", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodGet, "/", nil)
 		rec := httptest.NewRecorder()
+
+		// First request
 		rateLimitedHandler.ServeHTTP(rec, req)
-		return rec
-	}
+		assert.Equal(t, http.StatusOK, rec.Code)
+		assert.Equal(t, "OK", rec.Body.String())
 
-	// Test within the limit
-	for i := 0; i < 2; i++ { // Send two requests (limit is 2 per second)
-		resp := sendRequest()
-		if resp.Code != http.StatusOK {
-			t.Errorf("Expected status code 200, got %d", resp.Code)
-		}
-	}
+		// Second request
+		rec = httptest.NewRecorder()
+		rateLimitedHandler.ServeHTTP(rec, req)
+		assert.Equal(t, http.StatusOK, rec.Code)
+		assert.Equal(t, "OK", rec.Body.String())
+	})
 
-	// Test exceeding the limit
-	resp := sendRequest() // Third request should fail
-	if resp.Code != http.StatusTooManyRequests {
-		t.Errorf("Expected status code 429, got %d", resp.Code)
-	}
+	t.Run("Exceed limit", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rec := httptest.NewRecorder()
 
-	// Wait for the rate limiter to reset
-	time.Sleep(time.Second)
+		// Third request exceeds the limit
+		rateLimitedHandler.ServeHTTP(rec, req)
+		assert.Equal(t, http.StatusTooManyRequests, rec.Code)
+		assert.Equal(t, "Too Many Requests\n", rec.Body.String())
+	})
 
-	// Test after waiting for the limiter to reset
-	resp = sendRequest()
-	if resp.Code != http.StatusOK {
-		t.Errorf("Expected status code 200, got %d after reset", resp.Code)
-	}
+	t.Run("After reset", func(t *testing.T) {
+		// Wait for limiter to reset
+		time.Sleep(1 * time.Second)
+
+		req := httptest.NewRequest(http.MethodGet, "/", nil)
+		rec := httptest.NewRecorder()
+
+		// Request after reset should succeed
+		rateLimitedHandler.ServeHTTP(rec, req)
+		assert.Equal(t, http.StatusOK, rec.Code)
+		assert.Equal(t, "OK", rec.Body.String())
+	})
 }
